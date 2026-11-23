@@ -1,0 +1,10 @@
+{
+  "name": "麦麦 · 爱宠成长日记",
+  "appid": "__UNI__MAIMAI",
+  "description": "记录爱宠的每一个成长瞬间",
+  "versionName": "0.1.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "mp-weixin": {"appid":"", "setting":{"urlCheck":true}},
+  "app-plus": {"usingComponents":true, "distribute":{"android":{},"ios":{}}}
+}
