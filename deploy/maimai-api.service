@@ -1,0 +1,24 @@
+[Unit]
+Description=Maimai pet journal API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/maimai-api
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=3001
+EnvironmentFile=-/etc/maimai-api.env
+ExecStart=/usr/bin/env node /opt/maimai-api/index.js
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/maimai-api/data
+
+[Install]
+WantedBy=multi-user.target
