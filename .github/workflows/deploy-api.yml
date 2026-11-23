@@ -1,6 +1,9 @@
 name: Deploy Maimai API
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - deploy/redeploy.txt
 
 jobs:
   deploy:
