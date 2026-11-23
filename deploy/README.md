@@ -1,21 +1,15 @@
 # Ubuntu API deployment
 
-The server package is self contained in `server/`. It needs Node.js 22.13+ and a persistent directory at `/opt/maimai-api/data` for SQLite and uploaded media.
+The server package is self contained in `server/`. It uses Node.js 24 and stores SQLite data and uploaded media in `/opt/maimai-api/data`.
 
-After SSH access is available:
+## Deploy from GitHub Actions
 
-```sh
-sudo mkdir -p /opt/maimai-api/data
-sudo chown -R ubuntu:ubuntu /opt/maimai-api
-# Copy server/index.js, server/package.json and server/package-lock.json to /opt/maimai-api.
-cd /opt/maimai-api
-npm ci --omit=dev
-sudo cp /path/to/maimai-api.service /etc/systemd/system/maimai-api.service
-sudo systemctl daemon-reload
-sudo systemctl enable --now maimai-api
-curl http://127.0.0.1:3001/health
-```
+1. In the repository, open **Settings → Secrets and variables → Actions → New repository secret**. Name it `DEPLOY_SSH_PASSWORD` and enter the Ubuntu SSH password. Never commit the password to a file.
+2. Open **Actions → Deploy Maimai API → Run workflow**. The workflow transfers the server files to `123.206.111.20`, verifies an official Node.js download, installs production dependencies, registers a systemd service, and checks `http://127.0.0.1:3001/health` on the server.
+3. The API remains bound to localhost. To expose it to clients, set up a TLS reverse proxy with an owned domain, then set `/etc/maimai-api.env` to `PUBLIC_BASE_URL=https://your-api-domain` and restart `maimai-api`. A sample Caddy configuration is in `Caddyfile.example`.
 
-Keep the API bound to `127.0.0.1`. Put a TLS reverse proxy in front of it on port 443, then set `/etc/maimai-api.env` to `PUBLIC_BASE_URL=https://your-api-domain`. A sample Caddy configuration is in `deploy/Caddyfile.example`. Restart the service after changing the environment file.
+For a WeChat mini program, add the HTTPS domain to both request and upload domains in the WeChat console. An IP address alone is insufficient for release. Back up `/opt/maimai-api/data` regularly.
 
-For a WeChat mini program, the API requires an owned HTTPS domain configured as both a request and upload domain in the WeChat console. An IP address alone is insufficient for release. Back up `/opt/maimai-api/data` regularly.
+## Manual installation
+
+Upload `server/index.js`, `server/package.json`, `server/package-lock.json`, `deploy/maimai-api.service`, and `deploy/install-ubuntu.sh` to `/home/ubuntu/maimai-upload/`, then run `bash /home/ubuntu/maimai-upload/install-ubuntu.sh` as the `ubuntu` user. Passwordless sudo is required for the unattended installer.

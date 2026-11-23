@@ -1,0 +1,27 @@
+name: Deploy Maimai API
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare SSH client
+        env:
+          SSHPASS: ${{ secrets.DEPLOY_SSH_PASSWORD }}
+        run: |
+          test -n "$SSHPASS" || { echo 'DEPLOY_SSH_PASSWORD is missing'; exit 1; }
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq sshpass
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -T 10 -H 123.206.111.20 >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+          sshpass -e ssh -o BatchMode=no ubuntu@123.206.111.20 'mkdir -p /home/ubuntu/maimai-upload'
+          sshpass -e scp -o BatchMode=no server/index.js server/package.json server/package-lock.json deploy/maimai-api.service deploy/install-ubuntu.sh ubuntu@123.206.111.20:/home/ubuntu/maimai-upload/
+      - name: Install and verify API
+        env:
+          SSHPASS: ${{ secrets.DEPLOY_SSH_PASSWORD }}
+        run: sshpass -e ssh -o BatchMode=no ubuntu@123.206.111.20 'bash /home/ubuntu/maimai-upload/install-ubuntu.sh'

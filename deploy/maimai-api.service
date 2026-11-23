@@ -12,7 +12,7 @@ Environment=NODE_ENV=production
 Environment=HOST=127.0.0.1
 Environment=PORT=3001
 EnvironmentFile=-/etc/maimai-api.env
-ExecStart=/usr/bin/env node /opt/maimai-api/index.js
+ExecStart=/opt/maimai-node/v24.22.3/bin/node /opt/maimai-api/index.js
 Restart=on-failure
 RestartSec=5
 NoNewPrivileges=true
