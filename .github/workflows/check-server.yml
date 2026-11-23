@@ -1,0 +1,20 @@
+name: Check server SSH access
+on:
+  push:
+    paths:
+      - .github/workflows/check-server.yml
+  workflow_dispatch:
+
+jobs:
+  check-ssh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Check TCP port 22
+        run: |
+          if timeout 10 bash -c '</dev/tcp/123.206.111.20/22'; then
+            echo 'SSH port 22 is reachable from GitHub Actions.'
+          else
+            echo 'SSH port 22 is not reachable from GitHub Actions.'
+            exit 1
+          fi
